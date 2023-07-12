@@ -3,7 +3,7 @@ extern crate rand;
 extern crate rand_core;
 extern crate sha2;
 //extern crate gmp-mpfr-sys;
-//extern crate bls12_381;
+extern crate bls12_381;
 //extern crate curve25519_dalek;
 //extern crate chacha20;
 //extern crate rug;
@@ -11,7 +11,7 @@ extern crate sha2;
 
 
 //use std::convert::TryInto;
-//use bls12_381::{G1Projective, Scalar};
+use bls12_381::{G1Projective, Scalar};
 use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoScalar};
 //use chacha20::ChaCha20;
 //use chacha20::stream_cipher::{NewStreamCipher, SyncStreamCipher};
@@ -24,8 +24,6 @@ use curve25519_dalek::scalar::Scalar;
 
 
 use rand_core::OsRng;
-
-
 
 
 // Shamir's Secret Sharing (SSS)
@@ -52,6 +50,19 @@ pub fn generate_shares(secret: Scalar, num_players: usize, threshold: usize) -> 
     }
 
     shares
+}
+
+
+
+// EC cryptography with the BLS12-381 curve
+pub fn encrypt_share(share: Scalar, public_key: G1Projective) -> G1Projective {
+  let share_point = share * G1Projective::generator();
+  share_point + public_key
+}
+
+pub fn decrypt_share(encrypted_share: G1Projective, private_key: Scalar) -> Scalar {
+  let decrypted_share_point = encrypted_share - (private_key * G1Projective::generator());
+  decrypted_share_point.into_affine().scalar
 }
 
 

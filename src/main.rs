@@ -10,6 +10,7 @@ extern crate bls12_381;
 
 use sha2::Sha512;
 use rand::RngCore;
+//use std::convert::TryInto;
 use bls12_381::{G1Projective, Scalar};
 use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoScalar};
 //use chacha20::ChaCha20;
@@ -101,25 +102,40 @@ use std::env;
 //}
 
 // Schnorr Signatures
-fn schnorr_keygen() -> (Scalar, RistrettoPoint) {
+pub fn schnorr_keygen() -> (Scalar, RistrettoPoint) {
     let mut rng = rand::thread_rng();
     let private_key = Scalar::random(&mut rng);
     let public_key = private_key * RistrettoPoint::default();
     (private_key, public_key)
 }
 
-fn schnorr_sign(private_key: Scalar, message: &[u8]) -> (RistrettoPoint, Scalar) {
+pub fn schnorr_sign(private_key: Scalar, message: &[u8]) -> (RistrettoPoint, Scalar) 
+
+{
+    // Challenge generation
+   let mut temp: [u8;32] = [0u8;32];
+   // let mut hasher = Sha256::new();
+   // hasher.update(message.as_bytes());
+  // hasher.update(Ut.compress().to_bytes());
+ //  temp.copy_from_slice(hasher.finalize().as_slice());
+
+   // let c = Scalar::from_bytes_mod_order(temp);
+
     let mut rng = rand::thread_rng();
     let nonce = RistrettoScalar::random(&mut rng);
     let r = nonce * RistrettoPoint::default();
-    let e = Scalar::from_bytes_mod_order_sha3_512(&message);
+   // pub fn from_bytes_mod_order(bytes: [u8; 32]);
+    let e = Scalar::from_bytes_mod_order(temp);
     let s = nonce + (e * private_key);
     (r, s)
 }
 
-fn schnorr_verify(public_key: RistrettoPoint, signature: (RistrettoPoint, Scalar), message: &[u8]) -> bool {
+pub fn schnorr_verify(public_key: RistrettoPoint, signature: (RistrettoPoint, Scalar), message: &[u8]) -> bool 
+
+{
+    let mut temp: [u8;32] = [0u8;32];
     let (r, s) = signature;
-    let e = Scalar::from_bytes_mod_order_sha3_512(&message);
+    let e = Scalar::from_bytes_mod_order(temp);
     let rv = s * RistrettoPoint::default() - e * public_key;
     rv.compress() == r.compress()
 }

@@ -109,10 +109,11 @@ use std::env;
 // key genration of the Schnorr Signatures
 pub fn schnorr_keygen() -> (Scalar, RistrettoPoint) {
     let mut rng = rand::thread_rng();
-    let private_key = Scalar::random(&mut rng);
+    let private_key = Scalar::random(&mut OsRng);
     let public_key = private_key * RistrettoPoint::default();
     (private_key, public_key)
 }
+//&mut OsRng
 
 // signs random message of the Schnorr Signatures
 
@@ -128,8 +129,8 @@ pub fn schnorr_sign(private_key: Scalar, message: &[u8]) -> (RistrettoPoint, Sca
 
    // let c = Scalar::from_bytes_mod_order(temp);
 
-    let mut rng = rand::thread_rng();
-    let nonce = RistrettoScalar::random(&mut rng);
+    let mut os_rng = rand::thread_rng();
+    let nonce = RistrettoScalar::random(&mut OsRng);
     let r = nonce * RistrettoPoint::default();
    // pub fn from_bytes_mod_order(bytes: [u8; 32]);
     let e = Scalar::from_bytes_mod_order(temp);

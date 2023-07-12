@@ -1,15 +1,15 @@
 extern crate curve25519_dalek;
-extern crate rand_core;
+//extern crate rand_core;
 extern crate sha2;
 //extern crate gmp-mpfr-sys;
-//extern crate rand;
+extern crate rand;
 //extern crate bls12_381;
 //extern crate curve25519_dalek;
 //extern crate chacha20;
 //extern crate rug;
 
 use sha2::Sha512;
-//use rand::RngCore;
+use rand::RngCore;
 //use std::convert::TryInto;
 //use bls12_381::{G1Projective, Scalar};
 use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoScalar};

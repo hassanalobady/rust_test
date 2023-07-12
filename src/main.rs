@@ -1,9 +1,9 @@
 extern crate curve25519_dalek;
 extern crate rand_core;
 extern crate sha2;
-extern crate gmp-mpfr-sys;
-extern crate rand;
-extern crate bls12_381;
+//extern crate gmp-mpfr-sys;
+//extern crate rand;
+//extern crate bls12_381;
 //extern crate curve25519_dalek;
 //extern crate chacha20;
 //extern crate rug;
@@ -16,7 +16,7 @@ use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoSca
 //use chacha20::ChaCha20;
 //use chacha20::stream_cipher::{NewStreamCipher, SyncStreamCipher};
 //use chacha20::cipher::{KeyIvInit, StreamCipher, StreamCipherSeek};
-use hex_literal::hex;
+//use hex_literal::hex;
 //use std::env;
 
 use curve25519_dalek::constants;
@@ -102,12 +102,19 @@ use std::env;
 //}
 
 // Schnorr Signatures
+//1. Generates a random private key, generates the corresponding public key, 
+//2. signs a random message using Schnorr signatures with 'secp256k1',
+//3.  verifies the Schnorrsignature.
+
+// key genration of the Schnorr Signatures
 pub fn schnorr_keygen() -> (Scalar, RistrettoPoint) {
     let mut rng = rand::thread_rng();
     let private_key = Scalar::random(&mut rng);
     let public_key = private_key * RistrettoPoint::default();
     (private_key, public_key)
 }
+
+// signs random message of the Schnorr Signatures
 
 pub fn schnorr_sign(private_key: Scalar, message: &[u8]) -> (RistrettoPoint, Scalar) 
 
@@ -129,6 +136,8 @@ pub fn schnorr_sign(private_key: Scalar, message: &[u8]) -> (RistrettoPoint, Sca
     let s = nonce + (e * private_key);
     (r, s)
 }
+
+// the verifies of random message Schnorr signature.
 
 pub fn schnorr_verify(public_key: RistrettoPoint, signature: (RistrettoPoint, Scalar), message: &[u8]) -> bool 
 

@@ -30,7 +30,7 @@ use rand_core::OsRng;
 
 // Shamir's Secret Sharing (SSS)
 pub fn generate_shares(secret: Scalar, num_players: usize, threshold: usize) -> Vec<Scalar> {
-    let mut rng = rand::thread_rng();
+    let _rng = rand::thread_rng();
     let mut coefficients = Vec::with_capacity(threshold - 1);
     let mut shares = Vec::with_capacity(num_players);
 
@@ -39,10 +39,10 @@ pub fn generate_shares(secret: Scalar, num_players: usize, threshold: usize) -> 
     }
 
     for player in 0..num_players {
-        let mut share = secret;
+        let share = secret;
 
-        for (exp, coeff) in coefficients.iter().enumerate() {
-            let player_scalar = Scalar::from(player as u64 + 1);
+        for (_exp, _coeff) in coefficients.iter().enumerate() {
+            let _player_scalar = Scalar::from(player as u64 + 1);
            // share += coeff * player_scalar::Scalar(&[exp u64 + 1]);
            // share += coeff * player_scalar.pow(&[exp as u64 + 1]);
 

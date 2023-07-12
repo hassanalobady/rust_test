@@ -150,10 +150,10 @@ pub fn schnorr_verify(public_key: RistrettoPoint, signature: (RistrettoPoint, Sc
 }
 
 fn main() {
-    let num_players = 5;
-     let threshold = 3;
-    let num_bits = 128;
+//    let num_players = 5;
+  //   let threshold = 3;
+    //let num_bits = 128;
   
-    let random_bits = secure_random_bits(num_players, threshold, num_bits);
-    println!("Random Bits: {:?}", random_bits);
+    //let random_bits = secure_random_bits(num_players, threshold, num_bits);
+    //println!("Random Bits: {:?}", random_bits);
   }

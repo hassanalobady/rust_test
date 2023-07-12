@@ -1,8 +1,8 @@
 extern crate curve25519_dalek;
+extern crate rand;
 extern crate rand_core;
 extern crate sha2;
 //extern crate gmp-mpfr-sys;
-//extern crate rand;
 //extern crate bls12_381;
 //extern crate curve25519_dalek;
 //extern crate chacha20;
@@ -25,7 +25,7 @@ use curve25519_dalek::scalar::Scalar;
 
 // use rand::prelude::*;
 use sha2::{Sha256, Digest};
-//use rand::thread_rng;
+use rand::thread_rng;
 use rand_core::OsRng;
 use std::env;
 

@@ -18,11 +18,8 @@ use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoSca
 //use chacha20::cipher::{KeyIvInit, StreamCipher, StreamCipherSeek};
 //use hex_literal::hex;
 //use std::env;
-
 use curve25519_dalek::constants;
 use curve25519_dalek::scalar::Scalar;
-
-
 // use rand::prelude::*;
 use sha2::{Sha256, Digest};
 use rand::thread_rng;
@@ -35,13 +32,13 @@ use std::env;
 //3.  verifies the Schnorrsignature.
 
 // key genration of the Schnorr Signatures
-pub fn schnorr_keygen() -> (Scalar, RistrettoPoint) {
+pub fn schnorr_keygen() -> (Scalar, RistrettoPoint)
+ {
     let mut rng = rand::thread_rng();
     let private_key = Scalar::random(&mut OsRng);
     let public_key = private_key * RistrettoPoint::default();
     (private_key, public_key)
 }
-//&mut OsRng
 
 // signs random message of the Schnorr Signatures
 
@@ -50,17 +47,9 @@ pub fn schnorr_sign(private_key: Scalar, message: &[u8]) -> (RistrettoPoint, Sca
 {
     // Challenge generation
    let mut temp: [u8;32] = [0u8;32];
-   // let mut hasher = Sha256::new();
-   // hasher.update(message.as_bytes());
-  // hasher.update(Ut.compress().to_bytes());
- //  temp.copy_from_slice(hasher.finalize().as_slice());
-
-   // let c = Scalar::from_bytes_mod_order(temp);
-
     let mut os_rng = rand::thread_rng();
     let nonce = RistrettoScalar::random(&mut OsRng);
     let r = nonce * RistrettoPoint::default();
-   // pub fn from_bytes_mod_order(bytes: [u8; 32]);
     let e = Scalar::from_bytes_mod_order(temp);
     let s = nonce + (e * private_key);
     (r, s)

@@ -1,8 +1,8 @@
 extern crate curve25519_dalek;
-//extern crate rand_core;
+extern crate rand_core;
 extern crate sha2;
 //extern crate gmp-mpfr-sys;
-extern crate rand;
+//extern crate rand;
 //extern crate bls12_381;
 //extern crate curve25519_dalek;
 //extern crate chacha20;

@@ -26,6 +26,35 @@ use curve25519_dalek::scalar::Scalar;
 use rand_core::OsRng;
 
 
+
+
+// Shamir's Secret Sharing (SSS)
+pub fn generate_shares(secret: Scalar, num_players: usize, threshold: usize) -> Vec<Scalar> {
+    let mut rng = rand::thread_rng();
+    let mut coefficients = Vec::with_capacity(threshold - 1);
+    let mut shares = Vec::with_capacity(num_players);
+
+    for _ in 0..(threshold - 1) {
+        coefficients.push(Scalar::random(&mut OsRng));
+    }
+
+    for player in 0..num_players {
+        let mut share = secret;
+
+        for (exp, coeff) in coefficients.iter().enumerate() {
+            let player_scalar = Scalar::from(player as u64 + 1);
+           // share += coeff * player_scalar::Scalar(&[exp u64 + 1]);
+           // share += coeff * player_scalar.pow(&[exp as u64 + 1]);
+
+        }
+
+        shares.push(share);
+    }
+
+    shares
+}
+
+
 // Schnorr Signatures
 //1. Generates a random private key, generates the corresponding public key, 
 //2. signs a random message using Schnorr signatures with 'secp256k1',
@@ -67,6 +96,18 @@ pub fn schnorr_verify(public_key: RistrettoPoint, signature: (RistrettoPoint, Sc
     rv.compress() == r.compress()
 }
 
+
+#[cfg(test)]
+
+#[test]
+fn test_schnorr_sign_verify() {
+  let (private_key, public_key) = schnorr_keygen();
+  let message = b"test message";
+
+  let signature = schnorr_sign(private_key, message);
+  assert!(schnorr_verify(public_key, signature, message));
+}
+
 fn main() {
 //    let num_players = 5;
   //   let threshold = 3;
@@ -75,3 +116,4 @@ fn main() {
     //let random_bits = secure_random_bits(num_players, threshold, num_bits);
     //println!("Random Bits: {:?}", random_bits);
   }
+

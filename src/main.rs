@@ -9,9 +9,9 @@ extern crate sha2;
 //extern crate rug;
 
 use sha2::Sha512;
-use rand::RngCore;
+//use rand::RngCore;
 //use std::convert::TryInto;
-use bls12_381::{G1Projective, Scalar};
+//use bls12_381::{G1Projective, Scalar};
 use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoScalar};
 //use chacha20::ChaCha20;
 //use chacha20::stream_cipher::{NewStreamCipher, SyncStreamCipher};

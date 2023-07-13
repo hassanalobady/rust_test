@@ -33,23 +33,10 @@ use rand_core::OsRng;
 //use rand::Rng;
 
 // Generate random seed for each player
-//pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar> 
-pub fn generate_random_seed() -> Scalar
-{
-  let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
-
- // let mut rng = rand::thread_rng();
-
-  let mut bytes = [0u8; 32];
-  rng.fill_bytes(&mut bytes);
-  Scalar::from_bytes(&bytes)
+fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
+  let mut rng = rand::thread_rng();
+  (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
 }
-  //(0..num_players).map(|_| Scalar::random(&mut rng)).collect()
-
-//  (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
-
-//}
-
 // Compute curve points using random seeds
 
 pub fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective> {

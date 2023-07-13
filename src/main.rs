@@ -76,36 +76,47 @@ use std::collections::VecDeque;
 //use std::iter::FromIterator;
 
 
+// Generate random seed for each player
 fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
     let mut rng = rand::thread_rng();
     (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
 }
 
+// Compute curve points using random seeds
 fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective> {
     seeds.iter().map(|seed| G1Projective::generator() * seed).collect()
 }
 
+// Generate cryptographic commitments for each player
 fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> {
-    let generator = G1Projective::generator();
-    points.iter().map(|point| generator + point).collect()
+    let mut rng = rand::thread_rng();
+    points.iter().map(|point| G1Projective::generator() * Scalar::random(&mut rng)).collect()
 }
 
+// Verify commitments
 fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool {
-    let generator = G1Projective::generator();
     commitments.iter().zip(points).all(|(commitment, point)| {
         let challenge = Scalar::random(&mut rand::thread_rng());
-        let left = generator * challenge;
-        let right = *commitment + (point * challenge);
-        G1Affine::from(left) == G1Affine::from(right)
+        let left = G1Projective::generator() * challenge;
+        let right = commitment + (point * challenge);
+        left == right
     })
 }
 
-fn reveal_ciphertexts(ciphertexts: &[G1Projective]) -> Vec<u8> {
-    let mut result = Vec::new();
-    for scalar in ciphertexts {
-        result.extend_from_slice(&scalar.to_bytes());
-    }
-    result
+// Reveal ciphertexts and compute final randomness
+fn compute_final_randomness(commitments: &[G1Projective], seeds: &[Scalar]) -> [u8; 48] {
+    let challenge = Scalar::random(&mut rand::thread_rng());
+    let combined_commitment = commitments.iter().fold(G1Projective::identity(), |acc, commitment| acc + (commitment * challenge));
+    let combined_commitment_affine = G1Affine::from(combined_commitment);
+    let combined_seed = seeds.iter().fold(Scalar::zero(), |acc, seed| acc + (seed * challenge));
+    let combined_seed_bytes = combined_seed.to_bytes();
+
+    let mut final_randomness = [0u8; 48];
+    final_randomness[..16].copy_from_slice(&combined_commitment_affine.to_compressed().as_ref()[..16]);
+    final_randomness[16..32].copy_from_slice(&combined_commitment_affine.to_compressed().as_ref()[16..32]);
+    final_randomness[32..].copy_from_slice(&combined_seed_bytes);
+
+    final_randomness
 }
 
 #[cfg(test)]
@@ -146,13 +157,13 @@ mod tests {
     }
 
     #[test]
-    fn test_reveal_ciphertexts() {
+    fn test_compute_final_randomness() {
         let num_players = 5;
         let random_seeds = generate_random_seeds(num_players);
         let curve_points = compute_curve_points(&random_seeds);
-        let ciphertexts: Vec<G1Projective> = curve_points.clone();
-        let revealed = reveal_ciphertexts(&ciphertexts);
-        assert_eq!(revealed.len(), 32 * num_players);
+        let commitments = generate_commitments(&curve_points);
+        let final_randomness = compute_final_randomness(&commitments, &random_seeds);
+        assert_eq!(final_randomness.len(), 48);
     }
 }
 
@@ -162,8 +173,7 @@ fn main() {
     let curve_points = compute_curve_points(&random_seeds);
     let commitments = generate_commitments(&curve_points);
     let verified = verify_commitments(&commitments, &curve_points);
-    let ciphertexts = curve_points.clone();
-    let final_randomness = reveal_ciphertexts(&ciphertexts);
+    let final_randomness = compute_final_randomness(&commitments, &random_seeds);
 
     println!("Verified: {}", verified);
     println!("Final Randomness: {:?}", final_randomness);

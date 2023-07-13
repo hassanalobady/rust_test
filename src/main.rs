@@ -127,11 +127,23 @@ pub fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective])
   })
 }
 
-pub fn reveal_ciphertexts(commitments: &[G1Projective], seeds: &[Scalar]) -> Vec<Scalar> {
-  commitments.iter().zip(seeds).map(|(commitment, seed)| {
-      let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
-      commitment - (G1Projective::generator() * seed * challenge)
-  }).collect()
+//pub fn reveal_ciphertexts(commitments: &[G1Projective], seeds: &[Scalar]) -> Vec<Scalar> {
+ // commitments.iter().zip(seeds).map(|(commitment, seed)| {
+    //  let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
+    //  commitment - (G1Projective::generator() * seed * challenge)
+  //}).collect()
+//}
+
+
+fn reveal_ciphertexts(commitments: &[G1Projective], seeds: &[Scalar]) -> Vec<Scalar> {
+  commitments
+      .iter()
+      .zip(seeds)
+      .map(|(commitment, seed)| {
+          let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
+          commitment - (G1Projective::generator() * seed * challenge)
+      })
+      .collect()
 }
 
 pub fn compute_final_randomness(ciphertexts: &[Scalar]) -> Vec<u8> {

@@ -223,6 +223,7 @@ version = "0.1.0"
 dependencies = [
  "bls12_381",
  "curve25519-dalek",
+ "ff",
  "hex",
  "rand",
  "rand_core 0.5.1",

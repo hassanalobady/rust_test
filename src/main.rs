@@ -37,6 +37,8 @@
 //extern crate curve25519_dalek;
 extern crate bls12_381;
 extern crate rand;
+use ff::Field;
+
 
 use bls12_381::{G1Affine, G1Projective, Scalar};
 //use bls12_381::{G1Affine, G1Projective};
@@ -55,7 +57,7 @@ use rand::{thread_rng, Rng};
 //use rand::RngCore;
 
 use std::iter::FromIterator;
-
+use std::collections::VecDeque;
 //extern crate bls12_381;
 //extern crate rand;
 

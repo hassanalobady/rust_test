@@ -52,6 +52,8 @@ use std::env;
 
 //use rand::RngCore;
 use rand::{thread_rng, Rng};
+//use rand::RngCore;
+
 use std::iter::FromIterator;
 
 //extern crate bls12_381;
@@ -84,7 +86,7 @@ pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
 
 // Compute curve points using random seeds
 
-fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective>
+pub fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective>
  {
     seeds.iter().map(|seed| G1Projective::generator() * seed).collect()
 }
@@ -100,7 +102,7 @@ fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective>
     
 //}
 
-fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> 
+pub fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> 
 {
   points.iter().map(|point| G1Projective::generator() + point).collect()
 }
@@ -116,7 +118,7 @@ fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective>
    // })
 //}
 
-fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool {
+pub fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool {
   commitments.iter().zip(points).all(|(commitment, point)| {
       let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
       let left = G1Projective::generator() * challenge;
@@ -125,14 +127,14 @@ fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> 
   })
 }
 
-fn reveal_ciphertexts(commitments: &[G1Projective], seeds: &[Scalar]) -> Vec<Scalar> {
+pub fn reveal_ciphertexts(commitments: &[G1Projective], seeds: &[Scalar]) -> Vec<Scalar> {
   commitments.iter().zip(seeds).map(|(commitment, seed)| {
       let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
       commitment - (G1Projective::generator() * seed * challenge)
   }).collect()
 }
 
-fn compute_final_randomness(ciphertexts: &[Scalar]) -> Vec<u8> {
+pub fn compute_final_randomness(ciphertexts: &[Scalar]) -> Vec<u8> {
   let mut final_randomness = Vec::new();
   for scalar in ciphertexts {
       final_randomness.extend_from_slice(&scalar.to_bytes());

@@ -52,6 +52,8 @@ use std::env;
 
 //use rand::RngCore;
 use rand::{thread_rng, Rng};
+use std::iter::FromIterator;
+
 //extern crate bls12_381;
 //extern crate rand;
 

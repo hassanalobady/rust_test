@@ -98,19 +98,29 @@ fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective>
     
 //}
 
-fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> {
+fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> 
+{
   points.iter().map(|point| G1Projective::generator() + point).collect()
 }
 
 
 // Verify commitments
+//fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool {
+  //  commitments.iter().zip(points).all(|(commitment, point)| {
+  //      let challenge = Scalar::random(&mut rand::thread_rng());
+   //     let left = G1Projective::generator() * challenge;
+    //    let right = commitment + (point * challenge);
+    //    left == right
+   // })
+//}
+
 fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool {
-    commitments.iter().zip(points).all(|(commitment, point)| {
-        let challenge = Scalar::random(&mut rand::thread_rng());
-        let left = G1Projective::generator() * challenge;
-        let right = commitment + (point * challenge);
-        left == right
-    })
+  commitments.iter().zip(points).all(|(commitment, point)| {
+      let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
+      let left = G1Projective::generator() * challenge;
+      let right = commitment + (point * challenge);
+      G1Affine::from(left) == G1Affine::from(right)
+  })
 }
 
 // Reveal ciphertexts and compute final randomness

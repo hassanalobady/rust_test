@@ -123,21 +123,36 @@ fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> 
   })
 }
 
-// Reveal ciphertexts and compute final randomness
-fn compute_final_randomness(commitments: &[G1Projective], seeds: &[Scalar]) -> [u8; 48] {
-    let challenge = Scalar::random(&mut rand::thread_rng());
-    let combined_commitment = commitments.iter().fold(G1Projective::identity(), |acc, commitment| acc + (commitment * challenge));
-    let combined_commitment_affine = G1Affine::from(combined_commitment);
-    let combined_seed = seeds.iter().fold(Scalar::zero(), |acc, seed| acc + (seed * challenge));
-    let combined_seed_bytes = combined_seed.to_bytes();
-
-    let mut final_randomness = [0u8; 48];
-    final_randomness[..16].copy_from_slice(&combined_commitment_affine.to_compressed().as_ref()[..16]);
-    final_randomness[16..32].copy_from_slice(&combined_commitment_affine.to_compressed().as_ref()[16..32]);
-    final_randomness[32..].copy_from_slice(&combined_seed_bytes);
-
-    final_randomness
+fn reveal_ciphertexts(commitments: &[G1Projective], seeds: &[Scalar]) -> Vec<Scalar> {
+  commitments.iter().zip(seeds).map(|(commitment, seed)| {
+      let challenge = Scalar::from_bytes(&[0u8; 32]).unwrap(); // Substitute with the actual challenge value
+      commitment - (G1Projective::generator() * seed * challenge)
+  }).collect()
 }
+
+fn compute_final_randomness(ciphertexts: &[Scalar]) -> Vec<u8> {
+  let mut final_randomness = Vec::new();
+  for scalar in ciphertexts {
+      final_randomness.extend_from_slice(&scalar.to_bytes());
+  }
+  final_randomness
+}
+
+// Reveal ciphertexts and compute final randomness
+//fn compute_final_randomness(commitments: &[G1Projective], seeds: &[Scalar]) -> [u8; 48] {
+    //let challenge = Scalar::random(&mut rand::thread_rng());
+   // let combined_commitment = commitments.iter().fold(G1Projective::identity(), |acc, commitment| acc + (commitment * challenge));
+   // let combined_commitment_affine = G1Affine::from(combined_commitment);
+   // let combined_seed = seeds.iter().fold(Scalar::zero(), |acc, seed| acc + (seed * challenge));
+   // let combined_seed_bytes = combined_seed.to_bytes();
+
+  //  let mut final_randomness = [0u8; 48];
+   // final_randomness[..16].copy_from_slice(&combined_commitment_affine.to_compressed().as_ref()[..16]);
+   // final_randomness[16..32].copy_from_slice(&combined_commitment_affine.to_compressed().as_ref()[16..32]);
+   // final_randomness[32..].copy_from_slice(&combined_seed_bytes);
+
+    //final_randomness
+//}
 
 #[cfg(test)]
 mod tests {

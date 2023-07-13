@@ -77,7 +77,7 @@ use bls12_381::{G1Affine, G1Projective, Scalar};
 
 
 use rand::Rng;
-
+use group::Curve;
 fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
     let mut rng = rand::thread_rng();
     (0..num_players).map(|_| Scalar::random(&mut rng)).collect()

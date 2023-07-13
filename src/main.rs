@@ -153,7 +153,6 @@ fn compute_final_randomness(ciphertexts: &[Scalar]) -> Vec<u8> {
 
     //final_randomness
 //}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -192,13 +191,24 @@ mod tests {
     }
 
     #[test]
+    fn test_reveal_ciphertexts() {
+        let num_players = 5;
+        let random_seeds = generate_random_seeds(num_players);
+        let curve_points = compute_curve_points(&random_seeds);
+        let commitments = generate_commitments(&curve_points);
+        let ciphertexts = reveal_ciphertexts(&commitments, &random_seeds);
+        assert_eq!(ciphertexts.len(), num_players);
+    }
+
+    #[test]
     fn test_compute_final_randomness() {
         let num_players = 5;
         let random_seeds = generate_random_seeds(num_players);
         let curve_points = compute_curve_points(&random_seeds);
         let commitments = generate_commitments(&curve_points);
-        let final_randomness = compute_final_randomness(&commitments, &random_seeds);
-        assert_eq!(final_randomness.len(), 48);
+        let ciphertexts = reveal_ciphertexts(&commitments, &random_seeds);
+        let final_randomness = compute_final_randomness(&ciphertexts);
+        assert_eq!(final_randomness.len(), 32 * num_players);
     }
 }
 
@@ -208,7 +218,8 @@ fn main() {
     let curve_points = compute_curve_points(&random_seeds);
     let commitments = generate_commitments(&curve_points);
     let verified = verify_commitments(&commitments, &curve_points);
-    let final_randomness = compute_final_randomness(&commitments, &random_seeds);
+    let ciphertexts = reveal_ciphertexts(&commitments, &random_seeds);
+    let final_randomness = compute_final_randomness(&ciphertexts);
 
     println!("Verified: {}", verified);
     println!("Final Randomness: {:?}", final_randomness);

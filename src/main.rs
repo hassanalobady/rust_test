@@ -81,14 +81,18 @@ pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
 
 
 // Compute curve points using random seeds
-fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective> {
+fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective>
+ {
     seeds.iter().map(|seed| G1Projective::generator() * seed).collect()
 }
 
 // Generate cryptographic commitments for each player
-fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> {
+fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> 
+{
     let mut rng = rand::thread_rng();
-    points.iter().map(|point| G1Projective::generator() * Scalar::random(&mut rng)).collect()
+
+    points.iter().map(|point: &G1Projective| G1Projective::generator() * Scalar::random(&mut rng)).collect()
+    
 }
 
 // Verify commitments

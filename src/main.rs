@@ -9,7 +9,7 @@ use rand::Rng;
 use group::Curve;
 
 
-// Generate random seed for each player
+// Generate random seed for each player, in this function each player generates their own random seed.  
 pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar> 
 {
     let mut rng = rand::thread_rng();
@@ -17,21 +17,26 @@ pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar>
 
 }
 
-// Compute curve points using random seeds
+// Compute curve points using random seeds , 
+//in this function each player computes their curve point using their random seed and the BLS12-381 curve.
+
 pub fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective> 
 {
     seeds.iter().map(|seed| G1Projective::generator() * seed).collect()
 }
 
 
-// Generate cryptographic commitments for each player
+// Generate cryptographic commitments for each player,
+// in this function each player generates a cryptographic commitment using their curve point.
+
 pub fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> 
 {
     points.iter().map(|point| G1Projective::generator() + point).collect()
 }
 
 
-// Verify commitments
+// Verify commitments, in this function all players verify the commitments made by each player.
+
 pub fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool 
 {
     let generator = G1Projective::generator();
@@ -44,7 +49,7 @@ pub fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective])
     })
 }
 
-// Reveal ciphertexts  
+// Reveal ciphertexts, in this function each player reveals their ciphertexts, which are the curve points they generated.
 pub fn reveal_ciphertexts(ciphertexts: &[G1Projective]) -> Vec<u8>
  {
     let mut result = Vec::new();
@@ -55,7 +60,7 @@ pub fn reveal_ciphertexts(ciphertexts: &[G1Projective]) -> Vec<u8>
     result
 }
 
-//compute final randomness
+//compute final randomness.
 pub fn compute_final_randomness(ciphertexts: &[G1Projective]) -> Vec<u8>
  {
     let mut rng = rand::thread_rng();

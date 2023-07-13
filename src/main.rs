@@ -75,6 +75,7 @@ use std::collections::VecDeque;
 //use rand::Rng;
 //use std::iter::FromIterator;
 
+
 fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
     let mut rng = rand::thread_rng();
     (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
@@ -99,7 +100,7 @@ fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> 
     })
 }
 
-fn reveal_ciphertexts(ciphertexts: &[Scalar]) -> Vec<u8> {
+fn reveal_ciphertexts(ciphertexts: &[G1Projective]) -> Vec<u8> {
     let mut result = Vec::new();
     for scalar in ciphertexts {
         result.extend_from_slice(&scalar.to_bytes());
@@ -148,7 +149,8 @@ mod tests {
     fn test_reveal_ciphertexts() {
         let num_players = 5;
         let random_seeds = generate_random_seeds(num_players);
-        let ciphertexts = compute_curve_points(&random_seeds);
+        let curve_points = compute_curve_points(&random_seeds);
+        let ciphertexts: Vec<G1Projective> = curve_points.clone();
         let revealed = reveal_ciphertexts(&ciphertexts);
         assert_eq!(revealed.len(), 32 * num_players);
     }
@@ -160,7 +162,7 @@ fn main() {
     let curve_points = compute_curve_points(&random_seeds);
     let commitments = generate_commitments(&curve_points);
     let verified = verify_commitments(&commitments, &curve_points);
-    let ciphertexts = curve_points; // Just for testing, using curve points as ciphertexts
+    let ciphertexts = curve_points.clone();
     let final_randomness = reveal_ciphertexts(&ciphertexts);
 
     println!("Verified: {}", verified);

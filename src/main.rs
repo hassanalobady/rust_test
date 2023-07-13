@@ -1,4 +1,4 @@
-extern crate curve25519_dalek;
+//extern crate curve25519_dalek;
 extern crate rand;
 extern crate rand_core;
 extern crate sha2;
@@ -7,16 +7,21 @@ extern crate sha2;
 //extern crate curve25519_dalek;
 //extern crate chacha20;
 //extern crate rug;
-
 extern crate bls12_381;
 //extern crate rand;
 
+use bls12_381::{G1Affine, G1Projective, Scalar};
+use rand::RngCore;
+
+//extern crate bls12_381;
+//extern crate rand;
+
 //use bls12_381::{Scalar, G1Affine, G1Projective};
-use rand::{Rng, RngCore};
+//use rand::{Rng, RngCore};
 
 //use std::convert::TryInto;
 //use bls12_381::{G1Projective, Scalar};
-use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoScalar};
+//use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoScalar};
 
 //use chacha20::ChaCha20;
 //use chacha20::stream_cipher::{NewStreamCipher, SyncStreamCipher};
@@ -29,7 +34,7 @@ use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoSca
 
 use rand_core::OsRng;
 
-use bls12_381::Scalar;
+//use bls12_381::Scalar;
 //use rand::Rng;
 
 // Generate random seed for each player

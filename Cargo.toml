@@ -13,3 +13,4 @@ hex="0.4.3"
 rand_core = { version = "0.5", features = ["std"] }
 rand = "0.8.5"
 bls12_381 = "0.8.0"
+pairing-plus = "0.19.0"

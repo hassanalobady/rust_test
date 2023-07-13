@@ -8,7 +8,11 @@ extern crate sha2;
 //extern crate chacha20;
 //extern crate rug;
 
+extern crate bls12_381;
+//extern crate rand;
 
+use bls12_381::{Scalar, G1Affine, G1Projective};
+use rand::{Rng, RngCore};
 
 //use std::convert::TryInto;
 //use bls12_381::{G1Projective, Scalar};
@@ -20,49 +24,77 @@ use curve25519_dalek::{ristretto::RistrettoPoint, scalar::Scalar as RistrettoSca
 //use hex_literal::hex;
 //use std::env;
 
-use curve25519_dalek::scalar::Scalar;
+//use curve25519_dalek::scalar::Scalar;
 // use rand::prelude::*;
-
 
 use rand_core::OsRng;
 
+//use bls12_381::Scalar;
+//use rand::Rng;
 
-// Shamir's Secret Sharing (SSS)
-pub fn generate_shares(secret: Scalar, num_players: usize, threshold: usize) -> Vec<Scalar> {
-    let _rng = rand::thread_rng();
-    let mut coefficients = Vec::with_capacity(threshold - 1);
-    let mut shares = Vec::with_capacity(num_players);
+// Generate random seed for each player
+//pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar> 
+pub fn generate_random_seed() -> Scalar
+{
+  let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
 
-    for _ in 0..(threshold - 1) {
-        coefficients.push(Scalar::random(&mut OsRng));
-    }
+ // let mut rng = rand::thread_rng();
 
-    for player in 0..num_players {
-        let share = secret;
+  let mut bytes = [0u8; 32];
+  rng.fill_bytes(&mut bytes);
+  Scalar::from_bytes(&bytes)
+}
+  //(0..num_players).map(|_| Scalar::random(&mut rng)).collect()
 
-        for (_exp, _coeff) in coefficients.iter().enumerate() {
-            let _player_scalar = Scalar::from(player as u64 + 1);
+//  (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
 
-        }
+//}
 
-        shares.push(share);
-    }
+// Compute curve points using random seeds
 
-    shares
+pub fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective> {
+  seeds.iter().map(|seed| seed * G1Projective::generator()).collect()
 }
 
+// Generate cryptographic commitments for each player
+pub fn generate_commitments(points: &[G1Projective]) -> Vec<G1Projective> {
+  let mut rng = rand::thread_rng();
+  points.iter().map(|point| point * Scalar::random(&mut rng)).collect()
+}
 
+// Verify commitments
+pub fn verify_commitments(commitments: &[G1Projective], points: &[G1Projective]) -> bool {
+  let mut rng = rand::thread_rng();
+  commitments.iter().zip(points).all(|(commitment, point)| {
+      let challenge = Scalar::random(&mut rng);
+      let left = commitment * challenge;
+      let right = point * challenge;
+      left == right
+  })
+}
 
-// EC cryptography with the BLS12-381 curve
-//pub fn encrypt_share(share: Scalar, public_key: G1Projective) -> G1Projective {
-  //let share_point = share * G1Projective::generator();
-  //share_point + public_key
-//}
+// Reveal ciphertexts and compute final randomness
+pub fn compute_final_randomness(commitments: &[G1Projective], seeds: &[Scalar]) -> [u8; 48] {
+  let mut rng = rand::thread_rng();
+  let challenge = Scalar::random(&mut rng);
+  let mut combined_commitment = G1Projective::identity();
+  let mut combined_seed = Scalar::zero();
 
-//pub fn decrypt_share(encrypted_share: G1Projective, private_key: Scalar) -> Scalar {
-  //let decrypted_share_point = encrypted_share - (private_key * G1Projective::generator());
- // decrypted_share_point.into_affine().scalar
-//}
+  for (commitment, seed) in commitments.iter().zip(seeds) {
+      combined_commitment += commitment * challenge;
+      combined_seed += seed * challenge;
+  }
+
+  let combined_commitment_affine = G1Affine::from(combined_commitment);
+  let combined_seed_bytes = combined_seed.to_bytes();
+  let mut final_randomness = [0u8; 48];
+
+  final_randomness[..16].copy_from_slice(&combined_commitment_affine.get_u().to_bytes());
+  final_randomness[16..32].copy_from_slice(&combined_commitment_affine.get_v().to_bytes());
+  final_randomness[32..].copy_from_slice(&combined_seed_bytes);
+
+  final_randomness
+}
 
 
 // Schnorr Signatures

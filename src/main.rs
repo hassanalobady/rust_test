@@ -64,19 +64,20 @@ use rand::{thread_rng, Rng};
 //use bls12_381::{G1Affine, G1Projective, Scalar};
 //use rand::RngCore;
 
-// Generate random seed for each player
 //fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
   //  let mut rng = rand::thread_rng();
    // (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
 
     
-fn generate_random_scalar() -> Scalar {
-  let mut rng = rand::thread_rng();
-  let mut bytes = [0u8; 32];
-  rng.fill(&mut bytes);
-  Scalar::from_bytes(&bytes).unwrap()
-}
+// Generate random seed for each player
 
+pub fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
+  (0..num_players).map(|_| {
+      let mut bytes = [0u8; 32];
+      rand::thread_rng().fill(&mut bytes);
+      Scalar::from_bytes(&bytes).unwrap()
+  }).collect()
+}
 
 
 // Compute curve points using random seeds

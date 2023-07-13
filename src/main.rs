@@ -65,9 +65,9 @@ use rand::{thread_rng, Rng};
 //use rand::RngCore;
 
 // Generate random seed for each player
-fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
-    let mut rng = rand::thread_rng();
-    (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
+//fn generate_random_seeds(num_players: usize) -> Vec<Scalar> {
+  //  let mut rng = rand::thread_rng();
+   // (0..num_players).map(|_| Scalar::random(&mut rng)).collect()
 
     
 fn generate_random_scalar() -> Scalar {
@@ -77,7 +77,7 @@ fn generate_random_scalar() -> Scalar {
   Scalar::from_bytes(&bytes).unwrap()
 }
 
-}
+
 
 // Compute curve points using random seeds
 fn compute_curve_points(seeds: &[Scalar]) -> Vec<G1Projective> {
